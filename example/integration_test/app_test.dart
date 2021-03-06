@@ -11,7 +11,7 @@ import 'package:integration_test/integration_test.dart';
 
 import 'package:disable_battery_optimization_example/main.dart' as app;
 
-void main() => run(_testMain);
+void main() => _testMain();
 
 void _testMain() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
@@ -25,7 +25,7 @@ void _testMain() {
     expect(
       find.byWidgetPredicate(
         (Widget widget) => widget is Text &&
-                           widget.data.startsWith('Running on:'),
+                           widget.data!.startsWith('Running on:'),
       ),
       findsOneWidget,
     );

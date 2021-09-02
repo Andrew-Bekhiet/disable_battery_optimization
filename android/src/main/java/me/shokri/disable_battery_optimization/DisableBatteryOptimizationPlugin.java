@@ -22,11 +22,11 @@ public class DisableBatteryOptimizationPlugin implements FlutterPlugin, MethodCa
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
-  private Context applicationContext;
+  private FlutterPluginBinding pluginBinding;
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    this.applicationContext = flutterPluginBinding.getApplicationContext();
+    this.pluginBinding = flutterPluginBinding;
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "disable_battery_optimization");
     channel.setMethodCallHandler(this);
   }
@@ -34,7 +34,7 @@ public class DisableBatteryOptimizationPlugin implements FlutterPlugin, MethodCa
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
-    applicationContext = null;
+    pluginBinding = null;
     channel = null;
   }
 
@@ -62,8 +62,8 @@ public class DisableBatteryOptimizationPlugin implements FlutterPlugin, MethodCa
     }
   }
   private boolean isIgnoringBatteryOptimizations() {
-    String packageName = applicationContext.getPackageName();
-    PowerManager mPowerManager = (PowerManager) (applicationContext.getSystemService(POWER_SERVICE));
+    String packageName = pluginBinding.getApplicationContext().getPackageName();
+    PowerManager mPowerManager = (PowerManager) (pluginBinding.getApplicationContext().getSystemService(POWER_SERVICE));
 
     if(mPowerManager !=null && mPowerManager.isIgnoringBatteryOptimizations(packageName)) {
       return true;
@@ -75,16 +75,16 @@ public class DisableBatteryOptimizationPlugin implements FlutterPlugin, MethodCa
   private String openBatteryOptimizationSettings() {
     Intent intent = new Intent();
     intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-    applicationContext.startActivity(intent);
+    pluginBinding.getApplicationContext().startActivity(intent);
     return "Success";
   }
 
   private String stopOptimizingBatteryUsage() {
     Intent intent = new Intent();
-    String packageName = applicationContext.getPackageName();
+    String packageName = pluginBinding.getApplicationContext().getPackageName();
     intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
     intent.setData(Uri.parse("package:" + packageName));
-    applicationContext.startActivity(intent);
+    pluginBinding.getApplicationContext().startActivity(intent);
     return "Success";
   }
 

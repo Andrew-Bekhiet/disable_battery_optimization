@@ -1,9 +1,13 @@
 package me.shokri.disable_battery_optimization;
 
 import android.os.Build;
-
+import android.content.Context;
 import androidx.annotation.NonNull;
-
+import static android.content.Context.POWER_SERVICE;
+import android.content.Intent;
+import android.os.PowerManager;
+import android.provider.Settings;
+import android.net.Uri;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -59,7 +63,7 @@ public class DisableBatteryOptimizationPlugin implements FlutterPlugin, MethodCa
   }
   private boolean isIgnoringBatteryOptimizations() {
     String packageName = applicationContext.getPackageName();
-    mPowerManager = (PowerManager) (applicationContext.getSystemService(POWER_SERVICE));
+    PowerManager mPowerManager = (PowerManager) (applicationContext.getSystemService(POWER_SERVICE));
 
     if(mPowerManager !=null && mPowerManager.isIgnoringBatteryOptimizations(packageName)) {
       return true;

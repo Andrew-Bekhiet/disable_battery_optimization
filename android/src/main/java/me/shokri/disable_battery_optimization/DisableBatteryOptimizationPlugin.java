@@ -18,9 +18,11 @@ public class DisableBatteryOptimizationPlugin implements FlutterPlugin, MethodCa
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
+  private Context applicationContext;
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+    this.applicationContext = flutterPluginBinding.getApplicationContext();
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "disable_battery_optimization");
     channel.setMethodCallHandler(this);
   }
@@ -28,6 +30,8 @@ public class DisableBatteryOptimizationPlugin implements FlutterPlugin, MethodCa
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
+    applicationContext = null;
+    channel = null;
   }
 
   @Override
@@ -54,8 +58,8 @@ public class DisableBatteryOptimizationPlugin implements FlutterPlugin, MethodCa
     }
   }
   private boolean isIgnoringBatteryOptimizations() {
-    String packageName = mRegistrar.activeContext().getPackageName();
-    mPowerManager = (PowerManager) (mRegistrar.activeContext().getSystemService(POWER_SERVICE));
+    String packageName = applicationContext.getPackageName();
+    mPowerManager = (PowerManager) (applicationContext.getSystemService(POWER_SERVICE));
 
     if(mPowerManager !=null && mPowerManager.isIgnoringBatteryOptimizations(packageName)) {
       return true;
@@ -67,16 +71,16 @@ public class DisableBatteryOptimizationPlugin implements FlutterPlugin, MethodCa
   private String openBatteryOptimizationSettings() {
     Intent intent = new Intent();
     intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-    mRegistrar.activeContext().startActivity(intent);
+    applicationContext.startActivity(intent);
     return "Success";
   }
 
   private String stopOptimizingBatteryUsage() {
     Intent intent = new Intent();
-    String packageName = mRegistrar.activeContext().getPackageName();
+    String packageName = applicationContext.getPackageName();
     intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
     intent.setData(Uri.parse("package:" + packageName));
-    mRegistrar.activeContext().startActivity(intent);
+    applicationContext.startActivity(intent);
     return "Success";
   }
 
